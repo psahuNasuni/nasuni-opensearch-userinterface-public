@@ -1,7 +1,7 @@
 
 locals {
   lambda_code_files              = "SearchUI"
-  lambda_code_file_name_SearchUI = "Search_UI_lambda"
+  lambda_code_file_name_SearchUI = "search_es_indices"
   lambda_code_file_name_NMC_VOL  = "get_volume_names"
   lambda_folder                  = "Search_UI_lambda"
   lambda_code_extension          = ".py"
@@ -585,7 +585,7 @@ resource "aws_lambda_permission" "apigw_lambdaSearchUI" {
   action        = "lambda:InvokeFunction"
   function_name = "${aws_lambda_function.lambda_function_search_es.function_name}"
   principal     = "apigateway.amazonaws.com"
-  source_arn = "arn:aws:execute-api:${var.region}:${data.aws_caller_identity.current.account_id}:${aws_api_gateway_rest_api.SearchES-API.id}/${aws_api_gateway_stage.StageTheAPIdeployed.stage_name}/GET${aws_api_gateway_resource.APIresourceForVolumeFetch.path}"
+  source_arn = "arn:aws:execute-api:${var.region}:${data.aws_caller_identity.current.account_id}:${aws_api_gateway_rest_api.SearchES-API.id}/${aws_api_gateway_stage.StageTheAPIdeployed.stage_name}/GET${aws_api_gateway_resource.APIresourceForSearchUI.path}"
 }
 
 

@@ -1,6 +1,8 @@
 // Update this variable to point to your domain.
-var apigatewayendpoint = "https://06m0eux4g4.execute-api.us-east-2.amazonaws.com/dev/search-es"; 
-var volume_api = "https://06m0eux4g4.execute-api.us-east-2.amazonaws.com/dev/es-volume"; 
+// var apigatewayendpoint = 'https://jrol9tzdwc.execute-api.us-east-2.amazonaws.com/dev/search-es';
+
+var search_api = ""; 
+var volume_api = "";
 var loadingdiv = $('#loading');
 var noresults = $('#noresults');
 var resultdiv = $('#results');
@@ -11,11 +13,12 @@ var responseArr = [];
 var volume;
 var volSelect;
 let pagiResults = 1;
-var dataLen = 3;
+var dataLen = 4;
 var index = 0;
-var numArr = []
+var numArr = [];
+var result_index =0;
 
-// Executes the search function 250 milliseconds after user stops typing
+// Executes the search function 250 milliseconds after user stops typing abc abc
 searchbox.keyup(function() {
     clearTimeout(timer);
     timer = setTimeout(search, 500);
@@ -38,6 +41,8 @@ function paginationData(period) {
 
 async function search() {
     // Clear results before searching
+    result_index=0
+    responseArr=[]
     noresults.hide();
     resultdiv.empty();
     loadingdiv.show();
@@ -60,17 +65,25 @@ async function search() {
     // Only run a query if the string contains at least three characters
     if (query.length > 0) {
         // Make the HTTP request with the query as a parameter and wait for the JSON results
-        let response_data = await $.get(apigatewayendpoint, { q: query, size: 25 }, 'json');
-        console.log(response_data);
+        let response_data = await $.get(search_api, { q: query, size: 25 }, 'json');
 
         // Get the part of the JSON response that we care about
         if (response_data.length > 0) {
             loadingdiv.hide();
             noresults.hide();
+            for(var i=0;i<response_data.length;i++){
+                console.log(response_data[i].length)
+                result_index +=response_data[i].length
+                for(var j=0;j<response_data[i].length;j++){
+                    responseArr.push(response_data[i][j])
+                }
             // Iterate through the results and write them to HTML
-            resultdiv.append('<p class="result-status">Found ' + response_data.length + ' results.</p>');
-            responseArr = response_data;
+            if(result_index!=0){
+            resultdiv.empty()}
+            resultdiv.append('<p class="result-status">Found ' + result_index + ' results.</p>');
+            }
             appendData(resultdiv, responseArr);
+            console.log(responseArr)
         } else {
             noresults.show();
         }
@@ -92,7 +105,7 @@ async function start() {
     }
     console.log(volSelect)
     response = await $.get(volume_api, 'json');
-    arr = response.split(",");
+    arr = response.body.split(",");
     var chars = ['[', ']', '\\', '"'];
     replaceAll(chars);
 }
@@ -141,7 +154,7 @@ function indexChange() {
     index = numArr[pagiResults - 1]
 
     resultdiv.empty();
-    resultdiv.append('<p class="result-status">Found ' + responseArr.length + ' results.</p>');
+    resultdiv.append('<p class="result-status">Found ' + result_index + ' results.</p>');
     noresults.hide();
     loadingdiv.hide();
 
@@ -150,7 +163,7 @@ function indexChange() {
 
 //Appending all the results to the main resultdiv 
 function appendData(resultdiv, data) {
-    for (var i = index; i < dataLen + index ; i++) {
+    for (var j = index; j < dataLen + index ; j++) {
         var link = document.createElement("h5");
         var content = document.createElement("span");
         var resultBox = document.createElement("div");
@@ -158,22 +171,19 @@ function appendData(resultdiv, data) {
         resultBox.classList.add("result-box");
         spanDiv.classList.add("result-content");
 
-        if (data[i].length >= 0) {
-
-            for (var j = 0; j < data[i].length; j++) {
-                link.innerHTML = "<a class='elasti_link result-title' href=" + data[i][j]._source.access_url + ">" + data[i][j]._source.object_key + "</a>" + "<br>";
+        if (data.length >= 0) {
+                link.innerHTML = "<a class='elasti_link result-title' href=" + data[j]._source.access_url + ">" + data[j]._source.object_key + "</a>" + "<br>";
                 resultBox.append(link);
-                if (data[i][j].highlight.content.length > 0) {
-                    for (var k = 0; k < data[i][j].highlight.content.length; k++) {
-                        content.innerHTML += data[i][j].highlight.content[k];
-
+                if (data[j].highlight.content.length > 0) {
+                    for (var k = 0; k < data[j].highlight.content.length; k++) {
+                        content.innerHTML = data[j].highlight.content[k];
                         spanDiv.append(content);
                         resultBox.append(spanDiv);
                     }
                     resultdiv.append(resultBox);
 
                 }
-            }
+
 
             stop();
 
@@ -186,7 +196,7 @@ function appendData(resultdiv, data) {
 
 function paginationTrigger(data){
     if (pagiResults > 0) {
-        var totalPages = data.length / dataLen;
+        var totalPages = result_index / dataLen;
         if (totalPages % 1 != 0) {
             totalPages = Math.trunc(totalPages + 1)
         }
@@ -199,3 +209,4 @@ function paginationTrigger(data){
         createPagination(totalPages, page);
     }
 }
+

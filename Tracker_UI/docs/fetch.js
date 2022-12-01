@@ -4,6 +4,8 @@ var volumes = [];
 var services = [];
 var rowIndex = 0;
 var source;
+var schedulerName=""
+var trackerDoc = schedulerName+"_tracker.json"
 
 function readTextFile(file, callback) {
     var rawFile = new XMLHttpRequest();
@@ -19,17 +21,14 @@ function readTextFile(file, callback) {
 
 //usage:
 function trackerStart(){
-    readTextFile("Scheduler-AdminSecret.json", function(text){
+    readTextFile(trackerDoc, function(text){
         data = JSON.parse(text);
         result = Object.keys(data).map((key) => [Number(key), data[key]]);
         console.log(data.INTEGRATIONS);
         dataArr = result[0][1];
         console.log(dataArr)
-        console.log(dataArr.VOL_NAME1_OS._source.service)
         volumes = Object.keys(result[0][1])
-        
         console.log(volumes)
-        console.log(dataArr.VOL_NAME1_OS._source);
         tableAppend(result,volumes);
 
         

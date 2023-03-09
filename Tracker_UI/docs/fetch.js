@@ -63,7 +63,7 @@ function tableAppend(result,volumes) {
                     a.setAttribute("id","anchor");
                     button.appendChild(a)
                     a.appendChild(link)
-                    a.href=source[i]._source.default_url+"?q="+source[i]._source.volume
+                    a.href=source[i]._source.default_url+"?q="+source[i]._source.kendra_url
                     a.target = "_blank"
                     newCell.appendChild(a);
                 }

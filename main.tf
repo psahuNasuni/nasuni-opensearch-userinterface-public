@@ -716,19 +716,19 @@ resource "aws_api_gateway_gateway_response" "response" {
 ################### END - Create API Gateway Response Object ####################################################
 
 
-resource "null_resource" "update_search_js" {
-  provisioner "local-exec" {
-    # command = "sed -i 's#var volume_api.*$#var volume_api = \"${aws_api_gateway_deployment.APIdeploymentOfLambdaFunction.invoke_url}${aws_api_gateway_stage.StageTheAPIdeployed.stage_name}${aws_api_gateway_resource.APIresourceForVolumeFetch.path}\"; #g' SearchUI_Web/search.js"
-    command = "sed -i 's#var volume_api.*$#var volume_api = \"${aws_api_gateway_deployment.APIdeploymentOfLambdaFunction.invoke_url}${aws_api_gateway_stage.StageTheAPIdeployed.stage_name}${aws_api_gateway_resource.APIresourceForVolumeFetch.path}\"; #g' SearchUI_Web/search.js"
-  }
-  provisioner "local-exec" {
-    command = "sed -i 's#var search_api.*$#var search_api = \"${aws_api_gateway_deployment.APIdeploymentOfLambdaFunction.invoke_url}${aws_api_gateway_stage.StageTheAPIdeployed.stage_name}${aws_api_gateway_resource.APIresourceForSearchUI.path}\"; #g' SearchUI_Web/search.js"
-  }
-  provisioner "local-exec" {
-    command = "sed -i 's#var schedulerName.*$#var schedulerName = \"${var.nac_scheduler_name}\"; #g' Tracker_UI/docs/fetch.js"
-  }
-  provisioner "local-exec" {
-    command = "sudo service apache2 restart"
-  }
-  depends_on = [aws_api_gateway_rest_api.SearchES-API]
-}
+# resource "null_resource" "update_search_js" {
+#   provisioner "local-exec" {
+#     # command = "sed -i 's#var volume_api.*$#var volume_api = \"${aws_api_gateway_deployment.APIdeploymentOfLambdaFunction.invoke_url}${aws_api_gateway_stage.StageTheAPIdeployed.stage_name}${aws_api_gateway_resource.APIresourceForVolumeFetch.path}\"; #g' SearchUI_Web/search.js"
+#     command = "sed -i 's#var volume_api.*$#var volume_api = \"${aws_api_gateway_deployment.APIdeploymentOfLambdaFunction.invoke_url}${aws_api_gateway_stage.StageTheAPIdeployed.stage_name}${aws_api_gateway_resource.APIresourceForVolumeFetch.path}\"; #g' SearchUI_Web/search.js"
+#   }
+#   provisioner "local-exec" {
+#     command = "sed -i 's#var search_api.*$#var search_api = \"${aws_api_gateway_deployment.APIdeploymentOfLambdaFunction.invoke_url}${aws_api_gateway_stage.StageTheAPIdeployed.stage_name}${aws_api_gateway_resource.APIresourceForSearchUI.path}\"; #g' SearchUI_Web/search.js"
+#   }
+#   provisioner "local-exec" {
+#     command = "sed -i 's#var schedulerName.*$#var schedulerName = \"${var.nac_scheduler_name}\"; #g' Tracker_UI/docs/fetch.js"
+#   }
+#   provisioner "local-exec" {
+#     command = "sudo service apache2 restart"
+#   }
+#   depends_on = [aws_api_gateway_rest_api.SearchES-API]
+# }

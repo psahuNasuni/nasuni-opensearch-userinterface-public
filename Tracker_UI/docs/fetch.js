@@ -4,8 +4,9 @@ var volumes = [];
 var services = [];
 var rowIndex = 0;
 var source;
+var serviceName=""
 var schedulerName=""
-var trackerDoc = schedulerName+"_tracker.json"
+var trackerDoc = schedulerName+serviceName+"_tracker.json"
 
 function readTextFile(file, callback) {
     var rawFile = new XMLHttpRequest();
@@ -63,7 +64,11 @@ function tableAppend(result,volumes) {
                     a.setAttribute("id","anchor");
                     button.appendChild(a)
                     a.appendChild(link)
-                    a.href=source[i]._source.default_url+"?q="+source[i]._source.kendra_url
+                    if(serviceName=="kendra"){
+                        a.href=source[i]._source.default_url+"?q="+source[i]._source.kendra_url
+                    }else{
+                        a.href=source[i]._source.default_url+"?q="+source[i]._source.volume
+                    }
                     a.target = "_blank"
                     newCell.appendChild(a);
                 }

@@ -715,6 +715,22 @@ resource "aws_api_gateway_gateway_response" "response" {
 }
 ################### END - Create API Gateway Response Object ####################################################
 
+resource "aws_secretsmanager_secret_version" "admin_secret" {
+  secret_id     = data.aws_secretsmanager_secret.admin_secret.id
+  secret_string = jsonencode(local.admin_secret_data_to_update)
+  depends_on = [
+    aws_api_gateway_rest_api.SearchES-API,
+    data.aws_secretsmanager_secret.admin_secret,
+  ]
+}
+
+locals {
+  admin_secret_data_to_update = {
+    search_api_endpoint = "${aws_api_gateway_deployment.APIdeploymentOfLambdaFunction.invoke_url}${aws_api_gateway_stage.StageTheAPIdeployed.stage_name}${aws_api_gateway_resource.APIresourceForSearchUI.path}"
+    volume_api_endpoint = "${aws_api_gateway_deployment.APIdeploymentOfLambdaFunction.invoke_url}${aws_api_gateway_stage.StageTheAPIdeployed.stage_name}${aws_api_gateway_resource.APIresourceForVolumeFetch.path}"
+  }
+}
+
 
 # resource "null_resource" "update_search_js" {
 #   provisioner "local-exec" {

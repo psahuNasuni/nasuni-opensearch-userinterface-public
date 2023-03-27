@@ -717,7 +717,7 @@ resource "aws_api_gateway_gateway_response" "response" {
 
 
 resource "aws_secretsmanager_secret" "search_secret" {
-  name        = "nasuni-labs-searchapi-${random_id.unique_SearchUI_id.dec}"
+  name        = "nasuni-labs-search-api"
   description = "Nasuni search API (Opensearch specific) secret. This will be created as well as destroyed along with SearcgUI API."
 }
 resource "aws_secretsmanager_secret_version" "search_secret" {

@@ -715,17 +715,22 @@ resource "aws_api_gateway_gateway_response" "response" {
 }
 ################### END - Create API Gateway Response Object ####################################################
 
-resource "aws_secretsmanager_secret_version" "admin_secret" {
-  secret_id     = data.aws_secretsmanager_secret.admin_secret.id
-  secret_string = jsonencode(local.admin_secret_data_to_update)
+
+resource "aws_secretsmanager_secret" "search_secret" {
+  name        = "nasuni-labs-searchapi-${random_id.unique_SearchUI_id.dec}"
+  description = "Nasuni search API (Opensearch specific) secret. This will be created as well as destroyed along with SearcgUI API."
+}
+resource "aws_secretsmanager_secret_version" "search_secret" {
+  secret_id     = aws_secretsmanager_secret.search_secret.id
+  secret_string = jsonencode(local.admin_searchAPI_data_to_update)
   depends_on = [
-    aws_api_gateway_rest_api.SearchES-API,
-    data.aws_secretsmanager_secret.admin_secret,
+    aws_api_gateway_rest_api.SearchES-API
   ]
 }
 
+
 locals {
-  admin_secret_data_to_update = {
+  admin_searchAPI_data_to_update = {
     search_api_endpoint = "${aws_api_gateway_deployment.APIdeploymentOfLambdaFunction.invoke_url}${aws_api_gateway_stage.StageTheAPIdeployed.stage_name}${aws_api_gateway_resource.APIresourceForSearchUI.path}"
     volume_api_endpoint = "${aws_api_gateway_deployment.APIdeploymentOfLambdaFunction.invoke_url}${aws_api_gateway_stage.StageTheAPIdeployed.stage_name}${aws_api_gateway_resource.APIresourceForVolumeFetch.path}"
   }

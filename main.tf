@@ -735,10 +735,18 @@ locals {
     volume_api_endpoint = "${aws_api_gateway_deployment.APIdeploymentOfLambdaFunction.invoke_url}${aws_api_gateway_stage.StageTheAPIdeployed.stage_name}${aws_api_gateway_resource.APIresourceForVolumeFetch.path}"
   }
 }
-data "local_file" "secRet" {
-  filename   = "${path.cwd}/nasuni-labs-search-api-${random_id.unique_SearchUI_id.dec}.txt"
 
+resource "null_resource" "search-api-uid" {
+   provisioner "local-exec" {
+    command = "echo ${random_id.unique_SearchUI_id.dec} > search-api-${random_id.unique_SearchUI_id.dec}"
+  }
+   provisioner "local-exec" {
+    when    = destroy
+    command = "rm -rf search-api-*.txt"
+  }
+  depends_on = [aws_api_gateway_rest_api.SearchES-API]
 }
+
 
  resource "null_resource" "update_search_js" {
    provisioner "local-exec" {

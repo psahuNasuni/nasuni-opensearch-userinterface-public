@@ -717,7 +717,7 @@ resource "aws_api_gateway_gateway_response" "response" {
 
 
 resource "aws_secretsmanager_secret" "search_secret" {
-  name        = "nasuni-labs-search-api"
+  name        = "nasuni-labs-search-api-${random_id.unique_SearchUI_id.dec}"
   description = "Nasuni search API (Opensearch specific) secret. This will be created as well as destroyed along with SearcgUI API."
 }
 resource "aws_secretsmanager_secret_version" "search_secret" {
@@ -735,7 +735,10 @@ locals {
     volume_api_endpoint = "${aws_api_gateway_deployment.APIdeploymentOfLambdaFunction.invoke_url}${aws_api_gateway_stage.StageTheAPIdeployed.stage_name}${aws_api_gateway_resource.APIresourceForVolumeFetch.path}"
   }
 }
+data "local_file" "secRet" {
+  filename   = "${path.cwd}/nasuni-labs-search-api-${random_id.unique_SearchUI_id.dec}.txt"
 
+}
 
  resource "null_resource" "update_search_js" {
    provisioner "local-exec" {

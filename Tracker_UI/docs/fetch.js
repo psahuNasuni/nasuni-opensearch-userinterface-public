@@ -73,7 +73,7 @@ function tableAppend(result,volumes) {
                     a.setAttribute("id","anchor");
                     button.appendChild(a)
                     a.appendChild(link)
-                    if(serviceName=="kendra"){
+                    if(serviceName=="KENDRA"){
                         a.href=source[i]._source.kendra_url
                     } else if(serviceName=="ES"){
                         a.href=source[i]._source.default_url+"?q="+source[i]._source.volume

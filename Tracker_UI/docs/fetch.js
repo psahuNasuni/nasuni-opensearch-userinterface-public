@@ -6,7 +6,7 @@ var rowIndex = 0;
 var source;
 var serviceName
 var serviceList = ["ES","kendra"]
-var schedulerName = "tracker-ui"
+var schedulerName = "kendra-tracker-ui"
 var trackerDoc
 
 function readTextFile(file, callback) {
@@ -27,9 +27,10 @@ function trackerStart(){
     for(i=0;i<serviceList.length;i++){
         console.log(serviceList[i])
         serviceName=serviceList[i]
-        trackerDoc = serviceName+"_"+schedulerName+"_tracker.json"
+        trackerDoc = schedulerName+"_tracker_"+serviceName+".json"
         readTextFile(trackerDoc, function(text){
             data = JSON.parse(text);
+            console.log(data)
             result = Object.keys(data).map((key) => [Number(key), data[key]]);
             console.log(data.INTEGRATIONS);
             dataArr = result[0][1];
@@ -40,25 +41,15 @@ function trackerStart(){
         
         })
     }
-    // readTextFile(trackerDoc, function(text){
-    //     data = JSON.parse(text);
-    //     result = Object.keys(data).map((key) => [Number(key), data[key]]);
-    //     console.log(data.INTEGRATIONS);
-    //     dataArr = result[0][1];
-    //     console.log(dataArr)
-    //     volumes = Object.keys(result[0][1])
-    //     console.log(volumes)
-    //     tableAppend(result,volumes);
-
-        
-    // });
 }
 
 function tableAppend(result,volumes) {
+    console.log(result.length)
         volumes = Object.keys(result[0][1])
         volumes = [...new Set(volumes)]
         source = Object.values(result[0][1])
         console.log(source)
+        // for(pair=0;pair<dataArr.length;pair++){}
         for(i=0;i<volumes.length;i++){
             var tbodyRef = document.getElementById("dataTable").getElementsByTagName("tbody")[0];
             var newRow = tbodyRef.insertRow();
@@ -83,7 +74,7 @@ function tableAppend(result,volumes) {
                     button.appendChild(a)
                     a.appendChild(link)
                     if(serviceName=="kendra"){
-                        a.href=source[i]._source.default_url+"?q="+source[i]._source.kendra_url
+                        a.href=source[i]._source.kendra_url
                     } else if(serviceName=="ES"){
                         a.href=source[i]._source.default_url+"?q="+source[i]._source.volume
                     }

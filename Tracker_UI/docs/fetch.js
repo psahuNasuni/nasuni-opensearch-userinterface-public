@@ -5,7 +5,7 @@ var services = [];
 var rowIndex = 0;
 var source;
 var serviceName
-var serviceList = ["ES","kendra"]
+var serviceList = ["ES","KENDRA"]
 var schedulerName = "kendra-tracker-ui"
 var trackerDoc
 

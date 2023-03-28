@@ -742,7 +742,7 @@ resource "null_resource" "search-api-uid" {
   }
    provisioner "local-exec" {
     when    = destroy
-    command = "rm -rf search-api-*.txt"
+    command = "rm -rf search-api-*"
   }
   depends_on = [aws_api_gateway_rest_api.SearchES-API]
 }

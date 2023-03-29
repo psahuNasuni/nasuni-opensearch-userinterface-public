@@ -77,7 +77,7 @@ function tableAppend(result,volumes) {
                     if(source[i]._source.service==="KENDRA"){
                         a.href=source[i]._source.kendra_url
                     }else if(source[i]._source.service==="ES"){
-                        a.href=source[i]._source.default_url
+                        a.href=source[i]._source.default_url+"?q="+source[i]._source.volume
                     }
                 
                     a.target = "_blank"

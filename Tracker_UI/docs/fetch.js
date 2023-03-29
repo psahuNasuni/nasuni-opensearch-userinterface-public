@@ -25,8 +25,8 @@ function readTextFile(file, callback) {
 function trackerStart(){
     console.log(serviceList.length)
     for(i=0;i<serviceList.length;i++){
-        console.log(serviceList[i])
         serviceName=serviceList[i]
+        console.log(serviceName)
         trackerDoc = schedulerName+"_tracker_"+serviceName+".json"
         readTextFile(trackerDoc, function(text){
             data = JSON.parse(text);
@@ -73,12 +73,13 @@ function tableAppend(result,volumes) {
                     a.setAttribute("id","anchor");
                     button.appendChild(a)
                     a.appendChild(link)
-                    if(serviceName=="KENDRA"){
+
+                    if(source[i]._source.service==="KENDRA"){
                         a.href=source[i]._source.kendra_url
-                    } else if(serviceName=="ES"){
-                        a.href=source[i]._source.default_url+"?q="+source[i]._source.volume
+                    }else if(source[i]._source.service==="ES"){
+                        a.href=source[i]._source.default_url
                     }
-                    
+                
                     a.target = "_blank"
                     newCell.appendChild(a);
                 }

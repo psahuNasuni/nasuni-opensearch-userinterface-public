@@ -4,8 +4,10 @@ var volumes = [];
 var services = [];
 var rowIndex = 0;
 var source;
-var schedulerName=""
-var trackerDoc = schedulerName+"_tracker.json"
+var serviceName
+var serviceList = ["ES","KENDRA"]
+var schedulerName = "kendra-tracker-ui"
+var trackerDoc
 
 function readTextFile(file, callback) {
     var rawFile = new XMLHttpRequest();
@@ -21,25 +23,33 @@ function readTextFile(file, callback) {
 
 //usage:
 function trackerStart(){
-    readTextFile(trackerDoc, function(text){
-        data = JSON.parse(text);
-        result = Object.keys(data).map((key) => [Number(key), data[key]]);
-        console.log(data.INTEGRATIONS);
-        dataArr = result[0][1];
-        console.log(dataArr)
-        volumes = Object.keys(result[0][1])
-        console.log(volumes)
-        tableAppend(result,volumes);
-
+    console.log(serviceList.length)
+    for(i=0;i<serviceList.length;i++){
+        serviceName=serviceList[i]
+        console.log(serviceName)
+        trackerDoc = schedulerName+"_tracker_"+serviceName+".json"
+        readTextFile(trackerDoc, function(text){
+            data = JSON.parse(text);
+            console.log(data)
+            result = Object.keys(data).map((key) => [Number(key), data[key]]);
+            console.log(data.INTEGRATIONS);
+            dataArr = result[0][1];
+            console.log(dataArr)
+            volumes = Object.keys(result[0][1])
+            console.log(volumes)
+            tableAppend(result,volumes);
         
-    });
+        })
+    }
 }
 
 function tableAppend(result,volumes) {
+    console.log(result.length)
         volumes = Object.keys(result[0][1])
         volumes = [...new Set(volumes)]
         source = Object.values(result[0][1])
         console.log(source)
+        // for(pair=0;pair<dataArr.length;pair++){}
         for(i=0;i<volumes.length;i++){
             var tbodyRef = document.getElementById("dataTable").getElementsByTagName("tbody")[0];
             var newRow = tbodyRef.insertRow();
@@ -63,7 +73,13 @@ function tableAppend(result,volumes) {
                     a.setAttribute("id","anchor");
                     button.appendChild(a)
                     a.appendChild(link)
-                    a.href=source[i]._source.default_url+"?q="+source[i]._source.volume
+
+                    if(source[i]._source.service==="KENDRA"){
+                        a.href=source[i]._source.kendra_url
+                    }else if(source[i]._source.service==="ES"){
+                        a.href=source[i]._source.default_url+"?q="+source[i]._source.volume
+                    }
+                
                     a.target = "_blank"
                     newCell.appendChild(a);
                 }

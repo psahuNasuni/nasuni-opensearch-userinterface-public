@@ -716,19 +716,49 @@ resource "aws_api_gateway_gateway_response" "response" {
 ################### END - Create API Gateway Response Object ####################################################
 
 
-resource "null_resource" "update_search_js" {
-  provisioner "local-exec" {
-    # command = "sed -i 's#var volume_api.*$#var volume_api = \"${aws_api_gateway_deployment.APIdeploymentOfLambdaFunction.invoke_url}${aws_api_gateway_stage.StageTheAPIdeployed.stage_name}${aws_api_gateway_resource.APIresourceForVolumeFetch.path}\"; #g' SearchUI_Web/search.js"
-    command = "sed -i 's#var volume_api.*$#var volume_api = \"${aws_api_gateway_deployment.APIdeploymentOfLambdaFunction.invoke_url}${aws_api_gateway_stage.StageTheAPIdeployed.stage_name}${aws_api_gateway_resource.APIresourceForVolumeFetch.path}\"; #g' SearchUI_Web/search.js"
+resource "aws_secretsmanager_secret" "search_secret" {
+  name        = "nasuni-labs-search-api-${random_id.unique_SearchUI_id.dec}"
+  description = "Nasuni search API (Opensearch specific) secret. This will be created as well as destroyed along with SearcgUI API."
+}
+resource "aws_secretsmanager_secret_version" "search_secret" {
+  secret_id     = aws_secretsmanager_secret.search_secret.id
+  secret_string = jsonencode(local.admin_searchAPI_data_to_update)
+  depends_on = [
+    aws_api_gateway_rest_api.SearchES-API
+  ]
+}
+
+
+locals {
+  admin_searchAPI_data_to_update = {
+    search_api_endpoint = "${aws_api_gateway_deployment.APIdeploymentOfLambdaFunction.invoke_url}${aws_api_gateway_stage.StageTheAPIdeployed.stage_name}${aws_api_gateway_resource.APIresourceForSearchUI.path}"
+    volume_api_endpoint = "${aws_api_gateway_deployment.APIdeploymentOfLambdaFunction.invoke_url}${aws_api_gateway_stage.StageTheAPIdeployed.stage_name}${aws_api_gateway_resource.APIresourceForVolumeFetch.path}"
   }
-  provisioner "local-exec" {
-    command = "sed -i 's#var search_api.*$#var search_api = \"${aws_api_gateway_deployment.APIdeploymentOfLambdaFunction.invoke_url}${aws_api_gateway_stage.StageTheAPIdeployed.stage_name}${aws_api_gateway_resource.APIresourceForSearchUI.path}\"; #g' SearchUI_Web/search.js"
+}
+
+resource "null_resource" "search-api-uid" {
+   provisioner "local-exec" {
+    command = "echo ${random_id.unique_SearchUI_id.dec} > search-api-${random_id.unique_SearchUI_id.dec}"
   }
-  provisioner "local-exec" {
-    command = "sed -i 's#var schedulerName.*$#var schedulerName = \"${var.nac_scheduler_name}\"; #g' Tracker_UI/docs/fetch.js"
-  }
-  provisioner "local-exec" {
-    command = "sudo service apache2 restart"
+   provisioner "local-exec" {
+    when    = destroy
+    command = "rm -rf search-api-*"
   }
   depends_on = [aws_api_gateway_rest_api.SearchES-API]
 }
+
+
+ resource "null_resource" "update_search_js" {
+   provisioner "local-exec" {
+     # command = "sed -i 's#var volume_api.*$#var volume_api = \"${aws_api_gateway_deployment.APIdeploymentOfLambdaFunction.invoke_url}${aws_api_gateway_stage.StageTheAPIdeployed.stage_name}${aws_api_gateway_resource.APIresourceForVolumeFetch.path}\"; #g' SearchUI_Web/search.js"
+     command = "sed -i 's#var volume_api.*$#var volume_api = \"${aws_api_gateway_deployment.APIdeploymentOfLambdaFunction.invoke_url}${aws_api_gateway_stage.StageTheAPIdeployed.stage_name}${aws_api_gateway_resource.APIresourceForVolumeFetch.path}\"; #g' SearchUI_Web/search.js"
+   }
+   provisioner "local-exec" {
+     command = "sed -i 's#var search_api.*$#var search_api = \"${aws_api_gateway_deployment.APIdeploymentOfLambdaFunction.invoke_url}${aws_api_gateway_stage.StageTheAPIdeployed.stage_name}${aws_api_gateway_resource.APIresourceForSearchUI.path}\"; #g' SearchUI_Web/search.js"
+   }
+   provisioner "local-exec" {
+     command = "sed -i 's#var schedulerName.*$#var schedulerName = \"${var.nac_scheduler_name}\"; #g' Tracker_UI/docs/fetch.js"
+   }
+
+   depends_on = [aws_api_gateway_rest_api.SearchES-API]
+ }

@@ -5,7 +5,7 @@ var services = [];
 var rowIndex = 0;
 var source;
 var serviceName
-var serviceList = ["ES","KENDRA"]
+var serviceList = ["ES","OS","KENDRA"]
 var schedulerName = "kendra-tracker-ui"
 var trackerDoc
 
@@ -76,7 +76,7 @@ function tableAppend(result,volumes) {
 
                     if(source[i]._source.service==="KENDRA"){
                         a.href=source[i]._source.kendra_url
-                    }else if(source[i]._source.service==="ES"){
+                    }else if(source[i]._source.service==="ES" || source[i]._source.service==="OS"){
                         a.href=source[i]._source.default_url+"?q="+source[i]._source.volume
                     }
                 
